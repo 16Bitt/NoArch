@@ -1,14 +1,16 @@
-#include "virt-text.h"
+#include "stdlib.h"
+#include "stdio.h"
+#include "string.h"
 #include "virt-runtime.h"
-#include "virt-heap.h"
-#include "virt-common.h"
+
+virt_proc_t* current_proc;
 
 virt_proc_t* init_proc(long int ip, int stack_size, int rstack_size, long int* mem){
-	virt_proc_t* proc = (virt_proc_t*) virt_malloc(sizeof(virt_proc_t));
-	virt_memset(proc, 0, sizeof(virt_proc_t));
+	virt_proc_t* proc = (virt_proc_t*) malloc(sizeof(virt_proc_t));
+	memset(proc, 0, sizeof(virt_proc_t));
 	proc->mem =  mem;
-	proc->stack = (long int*) virt_malloc(sizeof(long int) * stack_size);
-	proc->rstack = (long int*) virt_malloc(sizeof(long int) * rstack_size);
+	proc->stack = (long int*) malloc(sizeof(long int) * stack_size);
+	proc->rstack = (long int*) malloc(sizeof(long int) * rstack_size);
 	proc->ip = ip;
 
 	return proc;
@@ -19,12 +21,22 @@ void virt_instruction(virt_proc_t* proc){
 	inst(proc);
 }
 
+void virt_scheduler(){
+	virt_instruction(current_proc);
+	current_proc = current_proc->next;
+}
+
 long int virt_pop(virt_proc_t* proc){
 	return proc->stack[proc->sp--];
 }
 
 void virt_push(virt_proc_t* proc, long int value){
 	proc->stack[++proc->sp] = value;
+}
+
+void virt_dump(virt_proc_t* proc){
+	printf("In proc %lX:\n", (unsigned long) proc);
+	printf("SP: %X\tRSP: %X\tIP: %X\n", proc->sp, proc->rsp, proc->ip);
 }
 
 #define MATH_GENERATE(name, type, op) void virt_ ## name (virt_proc_t* proc){ \

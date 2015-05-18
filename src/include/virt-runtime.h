@@ -2,7 +2,7 @@
 #define __VIRT_RUNTIME_H
 
 //This is the basic memory structure for a FORTH process
-typedef struct{
+typedef struct virt_proc{
 	//Registers
 	unsigned int ip;
 	unsigned int sp;
@@ -12,6 +12,8 @@ typedef struct{
 	long int* mem;
 	long int* stack;
 	long int* rstack;
+
+	struct virt_proc* next;
 } virt_proc_t;
 
 //This is the datatype for FORTH words (instructions)

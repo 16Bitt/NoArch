@@ -1,12 +1,14 @@
-build-common:
-	cd common && make
+SOURCES = $(patsubst %.c,%.o,$(wildcard *.c))
+CFLAGS	= -Iinclude
 
-noarch-i386: build-common
-	cd runtime/i386 && make
-
-noarch-linux: build-common
-	cd runtime/linux && make
-	gcc *.o -o noarch
+all: $(SOURCES)
+	$(CC) $(SOURCES) -o noarch
 
 clean:
-	-rm *.o noarch
+	-rm $(SOURCES) noarch
+
+run: all
+	./noarch
+
+nop:
+	@@echo Nop
